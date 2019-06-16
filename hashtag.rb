@@ -11,9 +11,10 @@ search_count = 100
 result = client.search(query, count: search_count, result_type: "recent")
 
 result.take(search_count).each do |tw|
-  next if tw.full_text.start_with?("RT @")
+  #RTは除外
+  #next if tw.full_text.start_with?("RT @")
   puts "https://twitter.com/#{tw.user.screen_name}/status/#{tw.id}"
-  puts tw.created_at
+  puts tw.created_at.getlocal
   puts tw.full_text
 end
 
