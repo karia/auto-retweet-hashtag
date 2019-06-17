@@ -1,5 +1,12 @@
 require 'twitter'
 
+def idCheck(id,arr)
+  arr.each do |i|
+    return true if i.to_s.chomp == id.to_s
+  end
+  return false
+end
+
 client = Twitter::REST::Client.new do |conf|
   conf.consumer_key = ENV['TWITTER_CONSUMER_KEY']
   conf.consumer_secret = ENV['TWITTER_CONSUMER_SECRET']
@@ -15,22 +22,32 @@ result_tw = client.search(query, count: search_count, result_type: "recent")
 done_id = File.open(done_list_file).readlines
 
 result_tw.take(search_count).each do |tw|
-  #RTは除外
-  next if tw.full_text.start_with?("RT @")
-  #新着以外は除外
-  next if done_id.include?(tw.id)
+  # 新着ID以外は除外
+  if idCheck(tw.id,done_id)
+    puts "skip: #{tw.id}"
+    next
+  end
 
-  # TODO: ここでRTする
+  # RTリストに追加
   done_id.push(tw.id)
 
-  puts "https://twitter.com/#{tw.user.screen_name}/status/#{tw.id}"
-  puts tw.created_at.getlocal
+  # RTはRTせずに終了
+  if tw.full_text.start_with?("RT @")
+    puts "[RT] https://twitter.com/#{tw.user.screen_name}/status/#{tw.id}"
+    next
+  end
+
+  # TODO: ここでRTする
+
+  # ログ取り用
+  puts "[NEW] https://twitter.com/#{tw.user.screen_name}/status/#{tw.id}"
   puts tw.full_text
+  puts tw.created_at.getlocal
 end
 
 # RT済IDを保存
 File.open(done_list_file, "w") do |f|
-  done_id.each do |id|
+  done_id.uniq.each do |id|
     f.puts(id)
   end
 end
