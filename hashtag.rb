@@ -10,6 +10,8 @@ end
 client = Twitter::REST::Client.new do |conf|
   conf.consumer_key = ENV['TWITTER_CONSUMER_KEY']
   conf.consumer_secret = ENV['TWITTER_CONSUMER_SECRET']
+  conf.access_token = ENV['TWITTER_ACCESS_TOKEN']
+  conf.access_token_secret = ENV['TWITTER_ACCESS_TOKEN_SECRET']
 end
 
 query = "#ミコのえほん"
@@ -24,7 +26,7 @@ done_id = File.open(done_list_file).readlines
 result_tw.take(search_count).each do |tw|
   # 新着ID以外は除外
   if idCheck(tw.id,done_id)
-    puts "skip: #{tw.id}"
+    # puts "skip: #{tw.id}"
     next
   end
 
@@ -37,9 +39,10 @@ result_tw.take(search_count).each do |tw|
     next
   end
 
-  # TODO: ここでRTする
+  # RTする
+  client.retweet(tw.id)
 
-  # ログ取り用
+  # RTしたツツイのログ取り
   puts "[NEW] https://twitter.com/#{tw.user.screen_name}/status/#{tw.id}"
   puts tw.full_text
   puts tw.created_at.getlocal
@@ -51,4 +54,6 @@ File.open(done_list_file, "w") do |f|
     f.puts(id)
   end
 end
+
+puts "wrote file"
 
