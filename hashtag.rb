@@ -26,7 +26,7 @@ done_id = File.open(done_list_file).readlines
 result_tw.take(search_count).each do |tw|
   # 新着ID以外は除外
   if idCheck(tw.id,done_id)
-    # puts "skip: #{tw.id}"
+    #puts "[skip] https://twitter.com/#{tw.user.screen_name}/status/#{tw.id}"
     next
   end
 
