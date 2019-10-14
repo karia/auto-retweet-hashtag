@@ -14,7 +14,7 @@ client = Twitter::REST::Client.new do |conf|
   conf.access_token_secret = ENV['TWITTER_ACCESS_TOKEN_SECRET']
 end
 
-query = "#ミコのえほん"
+query = "#ミコのえほん -RT"
 search_count = 100
 done_list_file = "/var/tmp/tmp_tw.txt"
 
